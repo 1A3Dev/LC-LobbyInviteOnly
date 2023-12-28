@@ -16,7 +16,7 @@ internal class PluginLoader : BaseUnityPlugin
 
     private readonly Harmony harmony = new Harmony(modGUID);
 
-    private const string modVersion = "1.0.1";
+    private const string modVersion = "1.0.2";
 
     private static bool initialized;
 

@@ -46,6 +46,6 @@
     </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-      <Exec Command="call &quot;C:\Users\Jenson\source\repos\LobbyInviteOnly\build_post.bat&quot;" />
+      <Exec Command="call &quot;C:\Users\Jenson\source\repos\LC-LobbyInviteOnly\build_post.bat&quot;" />
     </Target>
 </Project>

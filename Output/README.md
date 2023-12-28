@@ -2,9 +2,18 @@
 
 ## Information
 
-This mod allows you to create invite only lobbies as currently you can only do public & private (friend only) lobbies.
+This mod adds a new button when hosting a lobby which allows you to set it as invite-only. It was designed for people who want to play alone or with a specific group of friends without uninvited people being able to join.
+
+This is also useful if you or someone in your lobby has their steam "game details" privacy setting as public as that allows anyone to join a friends-only lobby by clicking the join button on the person's public steam profile.
+
+Note: Only the lobby host needs the mod installed (the mod isn't required to join an invite-only lobby).
 
 ## Changelog
+
+### 1.0.2
+
+- Added a bit of extra detail to the README.md
+- Updated the icon
 
 ### 1.0.0
 
