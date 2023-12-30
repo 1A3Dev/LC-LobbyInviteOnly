@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Reflection;
+﻿using System.Reflection;
 using BepInEx;
 using HarmonyLib;
 using Steamworks.Data;
@@ -16,7 +15,7 @@ internal class PluginLoader : BaseUnityPlugin
 
     private readonly Harmony harmony = new Harmony(modGUID);
 
-    private const string modVersion = "1.0.2";
+    private const string modVersion = "1.0.3";
 
     private static bool initialized;
 
@@ -58,7 +57,7 @@ class Patch
 
     [HarmonyPatch(typeof(MenuManager), "ClickHostButton")]
     [HarmonyPrefix]
-    private static bool MenuManagerClickHostButton(MenuManager __instance)
+    private static bool MenuManagerClickHostButton(ref MenuManager __instance)
     {
         __instance.HostSettingsScreen.SetActive(value: true);
         if (GameNetworkManager.Instance.disableSteam)
@@ -140,12 +139,18 @@ class Patch
 
     [HarmonyPatch(typeof(GameNetworkManager), "SteamMatchmaking_OnLobbyCreated")]
     [HarmonyPostfix]
-    internal static void SteamMatchmaking_OnLobbyCreated(GameNetworkManager __instance, Steamworks.Result result, Lobby lobby)
+    internal static void SteamMatchmaking_OnLobbyCreated(ref GameNetworkManager __instance, ref Steamworks.Result result, ref Lobby lobby)
     {
         if (isLobbyInviteOnly)
         {
             __instance.lobbyHostSettings.isLobbyPublic = false;
-            ((Lobby)lobby).SetPrivate();
+            lobby.SetPrivate();
+            lobby.SetData("inviteOnly", "true");
+            lobby.SetData("lobbyType", "Private");
+        }
+        else
+        {
+            lobby.SetData("lobbyType", __instance.lobbyHostSettings.isLobbyPublic ? "Public" : "Friends Only");
         }
     }
 }
