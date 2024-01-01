@@ -6,151 +6,152 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace LobbyInviteOnly;
-
-[BepInPlugin(modGUID, "LobbyInviteOnly", modVersion)]
-internal class PluginLoader : BaseUnityPlugin
+namespace LobbyInviteOnly
 {
-    private const string modGUID = "Dev1A3.LobbyInviteOnly";
-
-    private readonly Harmony harmony = new Harmony(modGUID);
-
-    private const string modVersion = "1.0.3";
-
-    private static bool initialized;
-
-    public static PluginLoader Instance { get; private set; }
-
-    private void Awake()
+    [BepInPlugin(modGUID, "LobbyInviteOnly", modVersion)]
+    internal class PluginLoader : BaseUnityPlugin
     {
-        if (initialized)
+        private const string modGUID = "Dev1A3.LobbyInviteOnly";
+
+        private readonly Harmony harmony = new Harmony(modGUID);
+
+        private const string modVersion = "1.0.3";
+
+        private static bool initialized;
+
+        public static PluginLoader Instance { get; private set; }
+
+        private void Awake()
         {
-            return;
+            if (initialized)
+            {
+                return;
+            }
+            initialized = true;
+            Instance = this;
+            Assembly patches = Assembly.GetExecutingAssembly();
+            harmony.PatchAll(patches);
         }
-        initialized = true;
-        Instance = this;
-        Assembly patches = Assembly.GetExecutingAssembly();
-        harmony.PatchAll(patches);
-    }
-}
-
-[HarmonyPatch]
-class Patch
-{
-    public static bool isLobbyInviteOnly = false;
-    public static Animator setInviteOnlyButtonAnimator;
-
-    private static void SetLobbyInviteOnly(ref MenuManager __instance)
-    {
-        if (GameNetworkManager.Instance.disableSteam)
-        {
-            return;
-        }
-
-        __instance.hostSettings_LobbyPublic = false;
-        isLobbyInviteOnly = true;
-        __instance.setPrivateButtonAnimator.SetBool("isPressed", false);
-        __instance.setPublicButtonAnimator.SetBool("isPressed", false);
-        setInviteOnlyButtonAnimator.SetBool("isPressed", true);
-        __instance.privatePublicDescription.text = "INVITE ONLY means you must send invites through Steam for players to join.";
     }
 
-    [HarmonyPatch(typeof(MenuManager), "ClickHostButton")]
-    [HarmonyPrefix]
-    private static bool MenuManagerClickHostButton(ref MenuManager __instance)
+    [HarmonyPatch]
+    class Patch
     {
-        __instance.HostSettingsScreen.SetActive(value: true);
-        if (GameNetworkManager.Instance.disableSteam)
+        public static bool isLobbyInviteOnly = false;
+        public static Animator setInviteOnlyButtonAnimator;
+
+        private static void SetLobbyInviteOnly(ref MenuManager __instance)
         {
-            __instance.HostSettingsOptionsLAN.SetActive(value: true);
-            __instance.HostSettingsOptionsNormal.SetActive(value: false);
+            if (GameNetworkManager.Instance.disableSteam)
+            {
+                return;
+            }
+
+            __instance.hostSettings_LobbyPublic = false;
+            isLobbyInviteOnly = true;
+            __instance.setPrivateButtonAnimator.SetBool("isPressed", false);
+            __instance.setPublicButtonAnimator.SetBool("isPressed", false);
+            setInviteOnlyButtonAnimator.SetBool("isPressed", true);
+            __instance.privatePublicDescription.text = "INVITE ONLY means you must send invites through Steam for players to join.";
         }
 
-        if ((bool)Object.FindObjectOfType<SaveFileUISlot>())
+        [HarmonyPatch(typeof(MenuManager), "ClickHostButton")]
+        [HarmonyPrefix]
+        private static bool MenuManagerClickHostButton(ref MenuManager __instance)
         {
-            Object.FindObjectOfType<SaveFileUISlot>().SetButtonColorForAllFileSlots();
-        }
+            __instance.HostSettingsScreen.SetActive(value: true);
+            if (GameNetworkManager.Instance.disableSteam)
+            {
+                __instance.HostSettingsOptionsLAN.SetActive(value: true);
+                __instance.HostSettingsOptionsNormal.SetActive(value: false);
+            }
 
-        if (isLobbyInviteOnly)
-        {
-            SetLobbyInviteOnly(ref __instance);
-        } else
-        {
-            __instance.HostSetLobbyPublic(__instance.hostSettings_LobbyPublic);
-        }
+            if ((bool)Object.FindObjectOfType<SaveFileUISlot>())
+            {
+                Object.FindObjectOfType<SaveFileUISlot>().SetButtonColorForAllFileSlots();
+            }
 
-        return false;
-    }
-
-    [HarmonyPatch(typeof(MenuManager), "Start")]
-    [HarmonyPostfix]
-    private static void MenuManagerStart(MenuManager __instance)
-    {
-        if (GameNetworkManager.Instance.disableSteam)
-        {
-            return;
-        }
-
-        float height = 14.5f;
-        GameObject publicButtonObject = GameObject.Find("/Canvas/MenuContainer/LobbyHostSettings/Panel/LobbyHostOptions/OptionsNormal/Public");
-        if (publicButtonObject != null)
-        {
-            height = publicButtonObject.GetComponent<RectTransform>().localPosition.y;
-
-            publicButtonObject.GetComponent<RectTransform>().localScale = new Vector3(0.7f, 0.9f, 1f);
-            publicButtonObject.GetComponent<RectTransform>().localPosition = new Vector3(-127f, height, 30f);
-        }
-
-        GameObject friendsButtonObject = GameObject.Find("/Canvas/MenuContainer/LobbyHostSettings/Panel/LobbyHostOptions/OptionsNormal/Private");
-        if (friendsButtonObject != null)
-        {
-            friendsButtonObject.GetComponent<RectTransform>().localScale = new Vector3(0.7f, 0.9f, 1f);
-            friendsButtonObject.GetComponent<RectTransform>().localPosition = new Vector3(40f, height, 30f);
-
-            GameObject inviteOnlyButtonObject = Object.Instantiate(friendsButtonObject.gameObject, friendsButtonObject.transform.parent);
-            inviteOnlyButtonObject.name = "InviteOnly";
-            inviteOnlyButtonObject.GetComponent<RectTransform>().localPosition = new Vector3(127f, height, 30f);
-            inviteOnlyButtonObject.GetComponentInChildren<TextMeshProUGUI>().text = "Invite-only";
-            setInviteOnlyButtonAnimator = inviteOnlyButtonObject.GetComponent<Animator>();
-            Button inviteOnlyButton = inviteOnlyButtonObject.GetComponent<Button>();
-            inviteOnlyButton.onClick = new Button.ButtonClickedEvent();
-            inviteOnlyButton.onClick.AddListener(() => {
+            if (isLobbyInviteOnly)
+            {
                 SetLobbyInviteOnly(ref __instance);
-            });
-        }
-    }
+            } else
+            {
+                __instance.HostSetLobbyPublic(__instance.hostSettings_LobbyPublic);
+            }
 
-    [HarmonyPatch(typeof(MenuManager), "HostSetLobbyPublic")]
-    [HarmonyPostfix]
-    private static void MenuManagerHostSetLobbyPublic(ref MenuManager __instance, bool setPublic = false)
-    {
-        if (GameNetworkManager.Instance.disableSteam)
-        {
-            return;
+            return false;
         }
 
-        isLobbyInviteOnly = false;
-        setInviteOnlyButtonAnimator.SetBool("isPressed", false);
-        if (!setPublic)
+        [HarmonyPatch(typeof(MenuManager), "Start")]
+        [HarmonyPostfix]
+        private static void MenuManagerStart(MenuManager __instance)
         {
-            __instance.privatePublicDescription.text = "FRIENDS ONLY means only friends or invited people can join.";
-        }
-    }
+            if (GameNetworkManager.Instance.disableSteam)
+            {
+                return;
+            }
 
-    [HarmonyPatch(typeof(GameNetworkManager), "SteamMatchmaking_OnLobbyCreated")]
-    [HarmonyPostfix]
-    internal static void SteamMatchmaking_OnLobbyCreated(ref GameNetworkManager __instance, ref Steamworks.Result result, ref Lobby lobby)
-    {
-        if (isLobbyInviteOnly)
-        {
-            __instance.lobbyHostSettings.isLobbyPublic = false;
-            lobby.SetPrivate();
-            lobby.SetData("inviteOnly", "true");
-            lobby.SetData("lobbyType", "Private");
+            float height = 14.5f;
+            GameObject publicButtonObject = GameObject.Find("/Canvas/MenuContainer/LobbyHostSettings/Panel/LobbyHostOptions/OptionsNormal/Public");
+            if (publicButtonObject != null)
+            {
+                height = publicButtonObject.GetComponent<RectTransform>().localPosition.y;
+
+                publicButtonObject.GetComponent<RectTransform>().localScale = new Vector3(0.7f, 0.9f, 1f);
+                publicButtonObject.GetComponent<RectTransform>().localPosition = new Vector3(-127f, height, 30f);
+            }
+
+            GameObject friendsButtonObject = GameObject.Find("/Canvas/MenuContainer/LobbyHostSettings/Panel/LobbyHostOptions/OptionsNormal/Private");
+            if (friendsButtonObject != null)
+            {
+                friendsButtonObject.GetComponent<RectTransform>().localScale = new Vector3(0.7f, 0.9f, 1f);
+                friendsButtonObject.GetComponent<RectTransform>().localPosition = new Vector3(40f, height, 30f);
+
+                GameObject inviteOnlyButtonObject = Object.Instantiate(friendsButtonObject.gameObject, friendsButtonObject.transform.parent);
+                inviteOnlyButtonObject.name = "InviteOnly";
+                inviteOnlyButtonObject.GetComponent<RectTransform>().localPosition = new Vector3(127f, height, 30f);
+                inviteOnlyButtonObject.GetComponentInChildren<TextMeshProUGUI>().text = "Invite-only";
+                setInviteOnlyButtonAnimator = inviteOnlyButtonObject.GetComponent<Animator>();
+                Button inviteOnlyButton = inviteOnlyButtonObject.GetComponent<Button>();
+                inviteOnlyButton.onClick = new Button.ButtonClickedEvent();
+                inviteOnlyButton.onClick.AddListener(() => {
+                    SetLobbyInviteOnly(ref __instance);
+                });
+            }
         }
-        else
+
+        [HarmonyPatch(typeof(MenuManager), "HostSetLobbyPublic")]
+        [HarmonyPostfix]
+        private static void MenuManagerHostSetLobbyPublic(ref MenuManager __instance, bool setPublic = false)
         {
-            lobby.SetData("lobbyType", __instance.lobbyHostSettings.isLobbyPublic ? "Public" : "Friends Only");
+            if (GameNetworkManager.Instance.disableSteam)
+            {
+                return;
+            }
+
+            isLobbyInviteOnly = false;
+            setInviteOnlyButtonAnimator.SetBool("isPressed", false);
+            if (!setPublic)
+            {
+                __instance.privatePublicDescription.text = "FRIENDS ONLY means only friends or invited people can join.";
+            }
+        }
+
+        [HarmonyPatch(typeof(GameNetworkManager), "SteamMatchmaking_OnLobbyCreated")]
+        [HarmonyPostfix]
+        internal static void SteamMatchmaking_OnLobbyCreated(ref GameNetworkManager __instance, ref Steamworks.Result result, ref Lobby lobby)
+        {
+            if (isLobbyInviteOnly)
+            {
+                __instance.lobbyHostSettings.isLobbyPublic = false;
+                lobby.SetPrivate();
+                lobby.SetData("inviteOnly", "true");
+                lobby.SetData("lobbyType", "Private");
+            }
+            else
+            {
+                lobby.SetData("lobbyType", __instance.lobbyHostSettings.isLobbyPublic ? "Public" : "Friends Only");
+            }
         }
     }
 }
