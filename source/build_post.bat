@@ -1,0 +1,3 @@
+copy ".\bin\Release\netstandard2.1\LobbyInviteOnly.dll" "..\thunderstore\LobbyInviteOnly.dll" /Y
+copy ".\bin\Release\netstandard2.1\LobbyInviteOnly.dll" "C:\Users\Jenson\AppData\Roaming\r2modmanPlus-local\LethalCompany\profiles\Default\BepInEx\plugins\Dev1A3-LobbyInviteOnly\LobbyInviteOnly.dll" /Y
+copy ".\bin\Release\netstandard2.1\LobbyInviteOnly.pdb" "C:\Users\Jenson\AppData\Roaming\r2modmanPlus-local\LethalCompany\profiles\Default\BepInEx\plugins\Dev1A3-LobbyInviteOnly\LobbyInviteOnly.pdb" /Y
