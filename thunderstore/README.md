@@ -3,7 +3,7 @@
 [![Discord](https://img.shields.io/discord/646323142737788928?style=for-the-badge&logo=discord&logoColor=white&label=Discord)](https://discord.gg/DZD2apDnMM)
 [![Ko-fi](https://img.shields.io/badge/Donate-F16061.svg?style=for-the-badge&logo=ko-fi&logoColor=white&label=Ko-fi)](https://ko-fi.com/K3K8SOM8U)
 
-### Overview
+### Information
 
 This mod adds a new button when hosting a lobby which allows you to set it as invite-only. It was designed for people who want to play alone or with a specific group of friends without uninvited people being able to join.
 
