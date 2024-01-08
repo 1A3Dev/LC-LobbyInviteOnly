@@ -1,3 +1,7 @@
+### 1.0.5
+
+- Added v47 Support
+
 ### 1.0.4
 
 - Updated README.md

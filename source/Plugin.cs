@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using BepInEx;
 using HarmonyLib;
 using Steamworks.Data;
@@ -66,9 +68,9 @@ namespace LobbyInviteOnly
                 __instance.HostSettingsOptionsNormal.SetActive(value: false);
             }
 
-            if ((bool)Object.FindObjectOfType<SaveFileUISlot>())
+            if ((bool)Object.FindAnyObjectByType<SaveFileUISlot>())
             {
-                Object.FindObjectOfType<SaveFileUISlot>().SetButtonColorForAllFileSlots();
+                Object.FindAnyObjectByType<SaveFileUISlot>().SetButtonColorForAllFileSlots();
             }
 
             if (isLobbyInviteOnly)
@@ -92,7 +94,7 @@ namespace LobbyInviteOnly
             }
 
             float height = 14.5f;
-            GameObject publicButtonObject = GameObject.Find("/Canvas/MenuContainer/LobbyHostSettings/Panel/LobbyHostOptions/OptionsNormal/Public");
+            GameObject publicButtonObject = GameObject.Find("/Canvas/MenuContainer/LobbyHostSettings/HostSettingsContainer/LobbyHostOptions/OptionsNormal/Public");
             if (publicButtonObject != null)
             {
                 height = publicButtonObject.GetComponent<RectTransform>().localPosition.y;
@@ -101,7 +103,7 @@ namespace LobbyInviteOnly
                 publicButtonObject.GetComponent<RectTransform>().localPosition = new Vector3(-127f, height, 30f);
             }
 
-            GameObject friendsButtonObject = GameObject.Find("/Canvas/MenuContainer/LobbyHostSettings/Panel/LobbyHostOptions/OptionsNormal/Private");
+            GameObject friendsButtonObject = GameObject.Find("/Canvas/MenuContainer/LobbyHostSettings/HostSettingsContainer/LobbyHostOptions/OptionsNormal/Private");
             if (friendsButtonObject != null)
             {
                 friendsButtonObject.GetComponent<RectTransform>().localScale = new Vector3(0.7f, 0.9f, 1f);
