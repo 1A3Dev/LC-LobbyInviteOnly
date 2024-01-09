@@ -53,7 +53,7 @@ namespace LobbyInviteOnly
             isLobbyInviteOnly = true;
             __instance.setPrivateButtonAnimator.SetBool("isPressed", false);
             __instance.setPublicButtonAnimator.SetBool("isPressed", false);
-            setInviteOnlyButtonAnimator.SetBool("isPressed", true);
+            setInviteOnlyButtonAnimator?.SetBool("isPressed", true);
             __instance.privatePublicDescription.text = "INVITE ONLY means you must send invites through Steam for players to join.";
         }
 
@@ -94,7 +94,7 @@ namespace LobbyInviteOnly
             }
 
             float height = 14.5f;
-            GameObject publicButtonObject = GameObject.Find("/Canvas/MenuContainer/LobbyHostSettings/HostSettingsContainer/LobbyHostOptions/OptionsNormal/Public");
+            GameObject publicButtonObject = GameObject.Find("/Canvas/MenuContainer/LobbyHostSettings/HostSettingsContainer/LobbyHostOptions/OptionsNormal/Public") ?? GameObject.Find("/Canvas/MenuContainer/LobbyHostSettings/Panel/LobbyHostOptions/OptionsNormal/Public");
             if (publicButtonObject != null)
             {
                 height = publicButtonObject.GetComponent<RectTransform>().localPosition.y;
@@ -103,7 +103,7 @@ namespace LobbyInviteOnly
                 publicButtonObject.GetComponent<RectTransform>().localPosition = new Vector3(-127f, height, 30f);
             }
 
-            GameObject friendsButtonObject = GameObject.Find("/Canvas/MenuContainer/LobbyHostSettings/HostSettingsContainer/LobbyHostOptions/OptionsNormal/Private");
+            GameObject friendsButtonObject = GameObject.Find("/Canvas/MenuContainer/LobbyHostSettings/HostSettingsContainer/LobbyHostOptions/OptionsNormal/Private") ?? GameObject.Find("/Canvas/MenuContainer/LobbyHostSettings/Panel/LobbyHostOptions/OptionsNormal/Private");
             if (friendsButtonObject != null)
             {
                 friendsButtonObject.GetComponent<RectTransform>().localScale = new Vector3(0.7f, 0.9f, 1f);
@@ -132,7 +132,7 @@ namespace LobbyInviteOnly
             }
 
             isLobbyInviteOnly = false;
-            setInviteOnlyButtonAnimator.SetBool("isPressed", false);
+            setInviteOnlyButtonAnimator?.SetBool("isPressed", false);
             if (!setPublic)
             {
                 __instance.privatePublicDescription.text = "FRIENDS ONLY means only friends or invited people can join.";

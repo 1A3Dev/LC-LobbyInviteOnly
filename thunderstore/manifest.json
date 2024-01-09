@@ -1,6 +1,6 @@
 {
   "name": "LobbyInviteOnly",
-  "version_number": "1.0.5",
+  "version_number": "1.0.6",
   "website_url": "https://github.com/1A3Dev/LC-LobbyInviteOnly",
   "description": "Adds a button to host an invite only lobby.",
   "dependencies": ["BepInEx-BepInExPack-5.4.2100"]

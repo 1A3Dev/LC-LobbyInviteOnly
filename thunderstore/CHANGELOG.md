@@ -1,3 +1,8 @@
+### 1.0.6
+
+- Updated README.md to mention v48 support.
+- Added v45 backwards compatibility.
+
 ### 1.0.5
 
 - Added v47 Support
