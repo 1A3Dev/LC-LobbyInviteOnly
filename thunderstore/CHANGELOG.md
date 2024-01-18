@@ -1,3 +1,7 @@
+### 1.0.7
+
+- Rewrote some of the code to improve compatibility with other mods.
+
 ### 1.0.6
 
 - Updated README.md to mention v48 support.

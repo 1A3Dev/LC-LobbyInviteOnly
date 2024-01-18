@@ -7,6 +7,7 @@ using Steamworks.Data;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.UI.Button;
 
 namespace LobbyInviteOnly
 {
@@ -42,51 +43,9 @@ namespace LobbyInviteOnly
         public static bool isLobbyInviteOnly = false;
         public static Animator setInviteOnlyButtonAnimator;
 
-        private static void SetLobbyInviteOnly(ref MenuManager __instance)
-        {
-            if (GameNetworkManager.Instance.disableSteam)
-            {
-                return;
-            }
-
-            __instance.hostSettings_LobbyPublic = false;
-            isLobbyInviteOnly = true;
-            __instance.setPrivateButtonAnimator.SetBool("isPressed", false);
-            __instance.setPublicButtonAnimator.SetBool("isPressed", false);
-            setInviteOnlyButtonAnimator?.SetBool("isPressed", true);
-            __instance.privatePublicDescription.text = "INVITE ONLY means you must send invites through Steam for players to join.";
-        }
-
-        [HarmonyPatch(typeof(MenuManager), "ClickHostButton")]
-        [HarmonyPrefix]
-        private static bool MenuManagerClickHostButton(ref MenuManager __instance)
-        {
-            __instance.HostSettingsScreen.SetActive(value: true);
-            if (GameNetworkManager.Instance.disableSteam)
-            {
-                __instance.HostSettingsOptionsLAN.SetActive(value: true);
-                __instance.HostSettingsOptionsNormal.SetActive(value: false);
-            }
-
-            if ((bool)Object.FindAnyObjectByType<SaveFileUISlot>())
-            {
-                Object.FindAnyObjectByType<SaveFileUISlot>().SetButtonColorForAllFileSlots();
-            }
-
-            if (isLobbyInviteOnly)
-            {
-                SetLobbyInviteOnly(ref __instance);
-            } else
-            {
-                __instance.HostSetLobbyPublic(__instance.hostSettings_LobbyPublic);
-            }
-
-            return false;
-        }
-
         [HarmonyPatch(typeof(MenuManager), "Start")]
         [HarmonyPostfix]
-        private static void MenuManagerStart(MenuManager __instance)
+        private static void MenuManager_Start(MenuManager __instance)
         {
             if (GameNetworkManager.Instance.disableSteam)
             {
@@ -101,6 +60,12 @@ namespace LobbyInviteOnly
 
                 publicButtonObject.GetComponent<RectTransform>().localScale = new Vector3(0.7f, 0.9f, 1f);
                 publicButtonObject.GetComponent<RectTransform>().localPosition = new Vector3(-127f, height, 30f);
+                Button publicButton = publicButtonObject.GetComponent<Button>();
+                publicButton.onClick.RemoveAllListeners();
+                publicButton.onClick.AddListener(() => {
+                    isLobbyInviteOnly = false;
+                    __instance.HostSetLobbyPublic(true);
+                });
             }
 
             GameObject friendsButtonObject = GameObject.Find("/Canvas/MenuContainer/LobbyHostSettings/HostSettingsContainer/LobbyHostOptions/OptionsNormal/Private") ?? GameObject.Find("/Canvas/MenuContainer/LobbyHostSettings/Panel/LobbyHostOptions/OptionsNormal/Private");
@@ -108,6 +73,12 @@ namespace LobbyInviteOnly
             {
                 friendsButtonObject.GetComponent<RectTransform>().localScale = new Vector3(0.7f, 0.9f, 1f);
                 friendsButtonObject.GetComponent<RectTransform>().localPosition = new Vector3(40f, height, 30f);
+                Button friendsButton = friendsButtonObject.GetComponent<Button>();
+                friendsButton.onClick.RemoveAllListeners();
+                friendsButton.onClick.AddListener(() => {
+                    isLobbyInviteOnly = false;
+                    __instance.HostSetLobbyPublic();
+                });
 
                 GameObject inviteOnlyButtonObject = Object.Instantiate(friendsButtonObject.gameObject, friendsButtonObject.transform.parent);
                 inviteOnlyButtonObject.name = "InviteOnly";
@@ -115,27 +86,31 @@ namespace LobbyInviteOnly
                 inviteOnlyButtonObject.GetComponentInChildren<TextMeshProUGUI>().text = "Invite-only";
                 setInviteOnlyButtonAnimator = inviteOnlyButtonObject.GetComponent<Animator>();
                 Button inviteOnlyButton = inviteOnlyButtonObject.GetComponent<Button>();
-                inviteOnlyButton.onClick = new Button.ButtonClickedEvent();
+                inviteOnlyButton.onClick.RemoveAllListeners();
                 inviteOnlyButton.onClick.AddListener(() => {
-                    SetLobbyInviteOnly(ref __instance);
+                    isLobbyInviteOnly = true;
+                    __instance.HostSetLobbyPublic();
                 });
             }
         }
 
         [HarmonyPatch(typeof(MenuManager), "HostSetLobbyPublic")]
         [HarmonyPostfix]
-        private static void MenuManagerHostSetLobbyPublic(ref MenuManager __instance, bool setPublic = false)
+        private static void MenuManager_HostSetLobbyPublic(ref MenuManager __instance, bool setPublic = false)
         {
             if (GameNetworkManager.Instance.disableSteam)
             {
                 return;
             }
 
-            isLobbyInviteOnly = false;
-            setInviteOnlyButtonAnimator?.SetBool("isPressed", false);
+            __instance.setPrivateButtonAnimator.SetBool("isPressed", !setPublic && !isLobbyInviteOnly);
+            setInviteOnlyButtonAnimator?.SetBool("isPressed", isLobbyInviteOnly);
             if (!setPublic)
             {
-                __instance.privatePublicDescription.text = "FRIENDS ONLY means only friends or invited people can join.";
+                if (isLobbyInviteOnly)
+                    __instance.privatePublicDescription.text = "INVITE ONLY means you must send invites through Steam for players to join.";
+                else
+                    __instance.privatePublicDescription.text = "FRIENDS ONLY means only friends or invited people can join.";
             }
         }
 
