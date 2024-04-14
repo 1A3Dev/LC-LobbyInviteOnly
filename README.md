@@ -16,8 +16,8 @@ _Note: Only the lobby host needs this mod, it does nothing for clients and is no
 ### Compatibility
 
 - Supported Game Versions:
-  - v48
-  - v47
+  - v50+
+  - v47-v49
   - v45
 - Works Well With:
   - [LethalRichPresence](https://thunderstore.io/c/lethal-company/p/mrov/LethalRichPresence/)

@@ -61,8 +61,9 @@ namespace LobbyInviteOnly
                 publicButtonObject.GetComponent<RectTransform>().localScale = new Vector3(0.7f, 0.9f, 1f);
                 publicButtonObject.GetComponent<RectTransform>().localPosition = new Vector3(-127f, height, 30f);
                 Button publicButton = publicButtonObject.GetComponent<Button>();
-                publicButton.onClick.RemoveAllListeners();
-                publicButton.onClick.AddListener(() => {
+                publicButton.onClick = new ButtonClickedEvent();
+                publicButton.onClick.AddListener(() =>
+                {
                     isLobbyInviteOnly = false;
                     __instance.HostSetLobbyPublic(true);
                 });
@@ -74,8 +75,9 @@ namespace LobbyInviteOnly
                 friendsButtonObject.GetComponent<RectTransform>().localScale = new Vector3(0.7f, 0.9f, 1f);
                 friendsButtonObject.GetComponent<RectTransform>().localPosition = new Vector3(40f, height, 30f);
                 Button friendsButton = friendsButtonObject.GetComponent<Button>();
-                friendsButton.onClick.RemoveAllListeners();
-                friendsButton.onClick.AddListener(() => {
+                friendsButton.onClick = new ButtonClickedEvent();
+                friendsButton.onClick.AddListener(() =>
+                {
                     isLobbyInviteOnly = false;
                     __instance.HostSetLobbyPublic();
                 });
@@ -86,8 +88,9 @@ namespace LobbyInviteOnly
                 inviteOnlyButtonObject.GetComponentInChildren<TextMeshProUGUI>().text = "Invite-only";
                 setInviteOnlyButtonAnimator = inviteOnlyButtonObject.GetComponent<Animator>();
                 Button inviteOnlyButton = inviteOnlyButtonObject.GetComponent<Button>();
-                inviteOnlyButton.onClick.RemoveAllListeners();
-                inviteOnlyButton.onClick.AddListener(() => {
+                inviteOnlyButton.onClick = new ButtonClickedEvent();
+                inviteOnlyButton.onClick.AddListener(() =>
+                {
                     isLobbyInviteOnly = true;
                     __instance.HostSetLobbyPublic();
                 });
